@@ -3,7 +3,7 @@ const button = document.getElementById('join_leave');
 const container = document.getElementById('container');
 const count = document.getElementById('count');
 let connected = false;
-let room, dataTrack, currSpeakerSID = null;
+let room, currSpeakerSID = null;
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack().then(track => {
@@ -49,21 +49,16 @@ function connect(username) {
             return Twilio.Video.connect(data.token, {dominantSpeaker: true});
         }).then(_room => {
             room = _room;
-            // Publishing the local Data Track to the Room
-            room.localParticipant.publishTrack(dataTrack);
             room.participants.forEach(participantConnected);
             room.on('dominantSpeakerChanged', participant =>{
                 console.log("Speaker Changed");
                 if(participant)
                 {
-                   document.getElementById("230").innerHTML = participant.identity;
                    handleSpeakerChange(participant);
                 }else
                 {
                    removeDominantSpeaker();
                 }
-//                    console.log('This speaker is ', participant.identity);
-//                handleSpeakerChange(participant);
             });
             room.on('participantConnected', participantConnected);
             room.on('participantDisconnected', participantDisconnected);
@@ -84,11 +79,6 @@ function updateParticipantCount() {
         count.innerHTML = (room.participants.size + 1) + ' participants online.';
 };
 
-function addLocalData() {
-    // Creates a Local Data Track
-    var localDataTrack = new Twilio.Video.LocalDataTrack();
-    dataTrack = localDataTrack;
-};
 
 function participantConnected(participant) {
     let participantDiv = document.createElement('div');
@@ -123,26 +113,11 @@ function participantDisconnected(participant) {
 };
 
 function trackSubscribed(div, track) {
-  if (track.kind === 'data') {
-    // Registering addToRemoteDataLabel(...) event handler Remote Data Track receive
-    track.on('message', data => {
-        addToRemoteDataLabel(JSON.parse(data).emojiData, track.sid);
-    });
-    // Attaching the data track to a display label
-    attachRemoteDataTrack(div,track);
-  }else{
     div.appendChild(track.attach());
-  }
 };
 
 function trackUnsubscribed(track) {
-    if(track.kind === 'data')
-    {
-        document.getElementById(track.sid).remove();
-    }else
-    {
-        track.detach().forEach(element => element.remove());
-    }
+    track.detach().forEach(element => element.remove());
 };
 
 function disconnect() {
@@ -154,58 +129,12 @@ function disconnect() {
     updateParticipantCount();
 };
 
-function activateEmojiButtons()
-{
-    let emojiButtonGroup = document.getElementsByClassName("emojibuttons");
-    let emojiButton;
-    for (let i = 0; i < emojiButtonGroup.length; i++)
-    {
-        emojiButton = emojiButtonGroup[i];
-        emojiButton.addEventListener('click', emojiButtonHandler);
-    }
-}
-
-function emojiButtonHandler(event){
-    let emojiButton = event.target;
-    let emojiText = emojiButton.innerHTML;
-    addToLocalDataLabel(emojiText);
-    sendDataToRoom(emojiText);
-}
-
-function addToLocalDataLabel(newText){
-    let localDataLabel = document.getElementById("datalocal");
-    localDataLabel.innerHTML = newText;
-    animateDataLabel(localDataLabel, "appear");
-}
-
-function attachRemoteDataTrack(div,track) {
-    let dataDiv = document.createElement('div');
-    dataDiv.setAttribute('id', track.sid);
-    dataDiv.setAttribute('class', "emoji");
-    div.appendChild(dataDiv);
-};
-
-function addToRemoteDataLabel(newText, dataTrackSID){
-    let remoteDataLabel = document.getElementById(dataTrackSID);
-    remoteDataLabel.innerHTML = newText;
-    animateDataLabel(remoteDataLabel, "appear");
-}
-
-function animateDataLabel(div, startClass){
-    setTimeout(function(){ div.classList.remove(startClass); }, 1000);
-    div.classList.add(startClass);
-}
-
-function sendDataToRoom(data){
-    dataTrack.send(JSON.stringify({
-        emojiData: data
-      }));
-}
 function setLabelColor(label, color){
     if(label != null){
         label.style.backgroundColor = color;
     }
 }
+
 function removeDominantSpeaker(){
     let speakerNameLabel;
     if(currSpeakerSID != null){
@@ -218,13 +147,11 @@ function assignDominantSpeaker(participant){
     let domSpeakerNameLabel;
     currSpeakerSID = "N_"+participant.sid;
     domSpeakerNameLabel = document.getElementById(currSpeakerSID);
-    setLabelColor(domSpeakerNameLabel, "#4CAF50");
+    setLabelColor(domSpeakerNameLabel, "#b5e7a0");
 }
 function handleSpeakerChange(participant){
     removeDominantSpeaker();
     assignDominantSpeaker(participant);
 }
 addLocalVideo();
-addLocalData();
-activateEmojiButtons();
 button.addEventListener('click', connectButtonHandler);
