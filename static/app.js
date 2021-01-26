@@ -52,14 +52,8 @@ function connect(username) {
             room.participants.forEach(participantConnected);
             room.on('dominantSpeakerChanged', participant =>{
                 console.log("Speaker Changed");
-                if(participant)
-                {
-                   handleSpeakerChange(participant);
-                }else
-                {
-                   removeDominantSpeaker();
-                }
-            });
+                handleSpeakerChange(participant);
+             });
             room.on('participantConnected', participantConnected);
             room.on('participantDisconnected', participantDisconnected);
             connected = true;
@@ -137,21 +131,20 @@ function setLabelColor(label, color){
 
 function removeDominantSpeaker(){
     let speakerNameLabel;
-    if(currSpeakerSID != null){
-        speakerNameLabel = document.getElementById(currSpeakerSID);
-        setLabelColor(speakerNameLabel, "#ebebeb");
-    }
+    speakerNameLabel = document.getElementById(currSpeakerSID);
+    setLabelColor(speakerNameLabel, "#ebebeb"); //Default Color
 }
 
 function assignDominantSpeaker(participant){
     let domSpeakerNameLabel;
     currSpeakerSID = "N_"+participant.sid;
     domSpeakerNameLabel = document.getElementById(currSpeakerSID);
-    setLabelColor(domSpeakerNameLabel, "#b5e7a0");
+    setLabelColor(domSpeakerNameLabel, "#b5e7a0"); //Green Color
 }
 function handleSpeakerChange(participant){
     removeDominantSpeaker();
-    assignDominantSpeaker(participant);
+    if(participant!=null)
+        assignDominantSpeaker(participant);
 }
 addLocalVideo();
 button.addEventListener('click', connectButtonHandler);
