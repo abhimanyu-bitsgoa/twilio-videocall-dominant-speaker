@@ -3,7 +3,7 @@ const button = document.getElementById('join_leave');
 const container = document.getElementById('container');
 const count = document.getElementById('count');
 let connected = false;
-let room, currSpeakerSID = null;
+let room, lastSpeakerSID = null;
 
 function addLocalVideo() {
     Twilio.Video.createLocalVideoTrack().then(track => {
@@ -51,7 +51,6 @@ function connect(username) {
             room = _room;
             room.participants.forEach(participantConnected);
             room.on('dominantSpeakerChanged', participant =>{
-                console.log("Speaker Changed");
                 handleSpeakerChange(participant);
              });
             room.on('participantConnected', participantConnected);
@@ -86,6 +85,7 @@ function participantConnected(participant) {
     labelDiv.innerHTML = participant.identity;
     // Add formatting to name of participant
     labelDiv.setAttribute('class', 'nameLabel');
+    //Add unique SID to the name tag
     labelDiv.setAttribute('id', 'N_'+participant.sid);
     participantDiv.appendChild(labelDiv);
 
@@ -131,14 +131,14 @@ function setLabelColor(label, color){
 
 function removeDominantSpeaker(){
     let speakerNameLabel;
-    speakerNameLabel = document.getElementById(currSpeakerSID);
+    speakerNameLabel = document.getElementById(lastSpeakerSID);
     setLabelColor(speakerNameLabel, "#ebebeb"); //Default Color
 }
 
 function assignDominantSpeaker(participant){
     let domSpeakerNameLabel;
-    currSpeakerSID = "N_"+participant.sid;
-    domSpeakerNameLabel = document.getElementById(currSpeakerSID);
+    lastSpeakerSID = "N_"+participant.sid;
+    domSpeakerNameLabel = document.getElementById(lastSpeakerSID);
     setLabelColor(domSpeakerNameLabel, "#b5e7a0"); //Green Color
 }
 function handleSpeakerChange(participant){
