@@ -132,14 +132,14 @@ function setLabelColor(label, color){
 function removeDominantSpeaker(){
     let speakerNameLabel;
     speakerNameLabel = document.getElementById(lastSpeakerSID);
-    setLabelColor(speakerNameLabel, "#ebebeb"); //Default Color
+    setLabelColor(speakerNameLabel, "#ebebeb"); //Default color
 }
 
 function assignDominantSpeaker(participant){
     let domSpeakerNameLabel;
     lastSpeakerSID = "N_"+participant.sid;
     domSpeakerNameLabel = document.getElementById(lastSpeakerSID);
-    setLabelColor(domSpeakerNameLabel, "#b5e7a0"); //Green Color
+    setLabelColor(domSpeakerNameLabel, "#b5e7a0"); //Green color
 }
 function handleSpeakerChange(participant){
     removeDominantSpeaker();
