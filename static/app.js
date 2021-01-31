@@ -124,7 +124,7 @@ function disconnect() {
 };
 
 function setLabelColor(label, color){
-    if(label != null){
+    if(label !== null){
         label.style.backgroundColor = color;
     }
 }
